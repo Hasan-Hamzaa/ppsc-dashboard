@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "updatedAt": "2026-04-09T09:45:35.069Z",
   "events": [
     {
       "id": "EVT-3001",
@@ -7,29 +8,89 @@
       "bank": "Arab Bank",
       "system": "ECC",
       "impact": "Medium",
-      "start": "2026-04-10T01:00",
-      "end": "2026-04-10T03:30",
+      "start": "2026-04-04T01:00",
+      "end": "2026-04-04T03:30",
       "notes": "Scheduled schema optimization and patch cycle."
     },
     {
-      "id": "EVT-3002",
-      "type": "Emergency",
-      "bank": "Bank of Palestine",
-      "system": "National Switch",
-      "impact": "Critical",
-      "start": "2026-04-12T09:00",
-      "end": "2026-04-12T13:30",
-      "notes": "Switch instability caused ATM routing interruption."
+      "id": "EVT-3004",
+      "type": "Planned",
+      "bank": "Safa Bank",
+      "system": "IBURAQ",
+      "impact": "Medium",
+      "start": "2026-04-11T14:00",
+      "end": "2026-04-11T16:00",
+      "notes": "Performance tuning for clearing channel."
     },
     {
-      "id": "EVT-3003",
+      "id": "EVT-3005",
+      "type": "Emergency",
+      "bank": "The National Bank",
+      "system": "ECC",
+      "impact": "High",
+      "start": "2026-04-13T08:00",
+      "end": "2026-04-13T14:00",
+      "notes": "Database failover and node recovery."
+    },
+    {
+      "id": "EVT-3006",
       "type": "Planned",
-      "bank": "Quds Bank",
+      "bank": "Cairo Amman Bank",
+      "system": "National Switch",
+      "impact": "High",
+      "start": "2026-04-15T23:00",
+      "end": "2026-04-16T04:00",
+      "notes": "Nightly core network hardening."
+    },
+    {
+      "id": "EVT-3007",
+      "type": "Planned",
+      "bank": "Bank of Palestine",
+      "system": "IBURAQ",
+      "impact": "Medium",
+      "start": "2026-04-18T11:00",
+      "end": "2026-04-18T14:30",
+      "notes": "Message queue patching and restart."
+    },
+    {
+      "id": "EVT-3008",
+      "type": "Emergency",
+      "bank": "Arab Bank",
       "system": "ESADAD",
-      "impact": "Low",
-      "start": "2026-04-14T22:00",
-      "end": "2026-04-15T01:00",
-      "notes": "Rolling deployment and API gateway update."
+      "impact": "Critical",
+      "start": "2026-04-20T07:00",
+      "end": "2026-04-20T15:00",
+      "notes": "Unexpected service degradation due to hardware issue."
+    }
+  ],
+  "activities": [
+    {
+      "id": "ACT-1775727934202-464",
+      "type": "delete",
+      "title": "Maintenance event deleted.",
+      "message": "EVT-3002 · Bank of Palestine · National Switch",
+      "timestamp": 1775727934202
+    },
+    {
+      "id": "ACT-1775727917853-293",
+      "type": "delete",
+      "title": "Maintenance event deleted.",
+      "message": "EVT-3003 · Quds Bank · ESADAD",
+      "timestamp": 1775727917853
+    },
+    {
+      "id": "ACT-1775727904566-819",
+      "type": "report",
+      "title": "Project data saved.",
+      "message": "0 events saved directly to data.json",
+      "timestamp": 1775727904566
+    },
+    {
+      "id": "ACT-1775727862265-200",
+      "type": "delete",
+      "title": "All maintenance events cleared.",
+      "message": "3 events removed",
+      "timestamp": 1775727862265
     }
   ]
 }
