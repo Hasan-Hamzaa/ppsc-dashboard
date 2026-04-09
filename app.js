@@ -7,7 +7,6 @@
         meta: 'ppsc_meta_v1'
     };
     const API_DATA_ENDPOINT = '/api/data';
-    const API_GITHUB_COMMIT_ENDPOINT = '/api/github/commit';
     const DATA_FILE_FALLBACK = 'data.json';
 
     const BANKS = [
@@ -950,7 +949,7 @@
     async function exportDataSnapshot() {
         const snapshot = buildProjectDataDocument();
         try {
-            const response = await fetch(API_GITHUB_COMMIT_ENDPOINT, {
+            const response = await fetch(API_DATA_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -959,27 +958,15 @@
             });
 
             if (!response.ok) {
-                let message = `Save failed with status ${response.status}`;
-                try {
-                    const body = await response.json();
-                    if (body && body.error) {
-                        message = body.error;
-                    }
-                } catch (parseError) {
-                    // Ignore response parsing failures and use the default message.
-                }
-                throw new Error(message);
+                throw new Error(`Save failed with status ${response.status}`);
             }
-
-            const result = await response.json();
 
             safeWrite(STORAGE_KEYS.events, state.events);
             safeWrite(STORAGE_KEYS.activity, state.activities);
-            logActivity('report', 'Project data committed to GitHub.', `${state.events.length} events pushed to repository`);
-            const shortSha = result && result.commitSha ? String(result.commitSha).slice(0, 7) : null;
-            showToast(shortSha ? `Saved and committed to GitHub (${shortSha}).` : 'Saved and committed to GitHub.', 'success');
+            logActivity('report', 'Project data saved.', `${state.events.length} events written to data.json`);
+            showToast('Saved directly to data.json.', 'success');
         } catch (error) {
-            showToast(`Save failed: ${error.message}`, 'error', 7000);
+            showToast('Save failed. Run the local API server with npm start.', 'error', 5000);
         }
     }
 
