@@ -34,6 +34,7 @@
     const state = {
         events: [],
         activities: [],
+        linkedDataFileHandle: null,
         filters: {
             banks: new Set(BANKS),
             systems: new Set(SYSTEMS)
@@ -140,11 +141,9 @@
         el.navLinks = Array.from(document.querySelectorAll('.nav-link'));
         el.lastUpdated = document.getElementById('lastUpdatedText');
 
-        el.exportBtn = document.getElementById('exportBtn');
         el.printBtn = document.getElementById('printBtn');
         el.saveJsonBtn = document.getElementById('saveJsonBtn');
-        el.importJsonBtn = document.getElementById('importJsonBtn');
-        el.importJsonInput = document.getElementById('importJsonInput');
+        el.linkDataFileBtn = document.getElementById('linkDataFileBtn');
 
         el.bankDropdownToggle = document.getElementById('bankDropdownToggle');
         el.systemDropdownToggle = document.getElementById('systemDropdownToggle');
@@ -227,13 +226,11 @@
             });
         });
 
-        el.exportBtn.addEventListener('click', exportCSV);
+        if (el.linkDataFileBtn) {
+            el.linkDataFileBtn.addEventListener('click', linkProjectDataFile);
+        }
         if (el.saveJsonBtn) {
             el.saveJsonBtn.addEventListener('click', exportDataSnapshot);
-        }
-        if (el.importJsonBtn && el.importJsonInput) {
-            el.importJsonBtn.addEventListener('click', () => el.importJsonInput.click());
-            el.importJsonInput.addEventListener('change', importDataSnapshot);
         }
         el.printBtn.addEventListener('click', () => {
             logActivity('report', 'Print view opened.');
@@ -939,87 +936,93 @@
         state.selectedEventId = null;
     }
 
-    function exportCSV() {
-        const visible = getVisibleEvents();
-        if (!visible.length) {
-            showToast('No rows available for export.', 'warning');
-            return;
-        }
-
-        const header = ['ID', 'Type', 'Bank', 'System', 'Impact', 'Start', 'End', 'Duration Hours', 'SLA Health', 'Notes'];
-        const rows = visible.map((event) => {
-            const health = downtimeHealth(event.durationHours);
-            return [
-                event.id,
-                event.type,
-                event.bank,
-                event.system,
-                event.impact,
-                event.start,
-                event.end,
-                event.durationHours.toFixed(2),
-                health,
-                event.notes || ''
-            ].map(escapeCsvCell);
-        });
-
-        const csv = [header.map(escapeCsvCell).join(','), ...rows.map((row) => row.join(','))].join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        const today = new Date();
-        const stamp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-        anchor.href = url;
-        anchor.download = `PPSC_Maintenance_Report_${stamp}.csv`;
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        URL.revokeObjectURL(url);
-
-        logActivity('report', 'CSV export generated.', `${visible.length} filtered rows exported`);
-        showToast('Filtered report exported as CSV.', 'success');
-    }
-
     async function exportDataSnapshot() {
         const snapshot = buildProjectDataDocument();
         const content = JSON.stringify(snapshot, null, 2);
-        const fileName = 'data.json';
 
-        if (window.showSaveFilePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: fileName,
-                    types: [{
-                        description: 'JSON Files',
-                        accept: { 'application/json': ['.json'] }
-                    }]
-                });
-                const writable = await handle.createWritable();
-                await writable.write(content);
-                await writable.close();
-                logActivity('report', 'Project data saved.', `${state.events.length} events saved to ${fileName}`);
-                showToast('data.json saved. Git can now detect file changes.', 'success');
-                return;
-            } catch (error) {
-                if (error && error.name === 'AbortError') {
-                    return;
-                }
+        const directWriteDone = await writeSnapshotToLinkedFile(content);
+        if (directWriteDone) {
+            return;
+        }
+        showToast('Link data.json first, then Save to write directly to the project file.', 'warning', 5000);
+    }
+
+    async function linkProjectDataFile() {
+        const handle = await getOrRequestDataFileHandle(true);
+        if (!handle) {
+            return;
+        }
+        showToast('data.json linked. Save now writes directly to this file.', 'success');
+    }
+
+    async function writeSnapshotToLinkedFile(content) {
+        const handle = await getOrRequestDataFileHandle(false);
+        if (!handle) {
+            return false;
+        }
+
+        try {
+            const writable = await handle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            logActivity('report', 'Project data saved.', `${state.events.length} events saved directly to data.json`);
+            showToast('Saved directly to linked data.json file.', 'success');
+            return true;
+        } catch (error) {
+            showToast('Direct save failed. Re-link data.json and try again.', 'error', 5000);
+            state.linkedDataFileHandle = null;
+            return false;
+        }
+    }
+
+    async function getOrRequestDataFileHandle(forcePick) {
+        if (!window.showOpenFilePicker) {
+            return null;
+        }
+
+        if (!forcePick && state.linkedDataFileHandle) {
+            const permission = await state.linkedDataFileHandle.queryPermission({ mode: 'readwrite' });
+            if (permission === 'granted') {
+                return state.linkedDataFileHandle;
+            }
+            const request = await state.linkedDataFileHandle.requestPermission({ mode: 'readwrite' });
+            if (request === 'granted') {
+                return state.linkedDataFileHandle;
             }
         }
 
-        const blob = new Blob([content], { type: 'application/json;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.href = url;
-        anchor.download = fileName;
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        URL.revokeObjectURL(url);
+        try {
+            const [handle] = await window.showOpenFilePicker({
+                multiple: false,
+                types: [{
+                    description: 'JSON Files',
+                    accept: { 'application/json': ['.json'] }
+                }]
+            });
 
-        logActivity('report', 'Project data exported.', `${state.events.length} events exported as ${fileName}`);
-        showToast('data.json downloaded. Move it into the project root, then commit.', 'success');
+            if (!handle) {
+                return null;
+            }
+
+            if (handle.name !== 'data.json') {
+                showToast('Tip: choose your project data.json file for direct Git-tracked saves.', 'warning', 5000);
+            }
+
+            const permission = await handle.requestPermission({ mode: 'readwrite' });
+            if (permission !== 'granted') {
+                showToast('Write permission denied for selected file.', 'warning');
+                return null;
+            }
+
+            state.linkedDataFileHandle = handle;
+            return handle;
+        } catch (error) {
+            if (error && error.name === 'AbortError') {
+                return null;
+            }
+            showToast('Could not link data file. Use Save fallback download if needed.', 'warning', 5000);
+            return null;
+        }
     }
 
     function toSerializableEvent(event) {
@@ -1046,66 +1049,6 @@
             updatedAt: new Date().toISOString(),
             events,
             activities: state.activities.slice(0, 100)
-        };
-    }
-
-    function importDataSnapshot(event) {
-        const fileInput = event.target;
-        const file = fileInput.files && fileInput.files[0];
-        if (!file) {
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            try {
-                const payload = JSON.parse(String(reader.result || '{}'));
-                const imported = validateImportedSnapshot(payload);
-                state.events = imported.events.map(normalizeEvent);
-                state.activities = imported.activities;
-                persistEvents();
-                safeWrite(STORAGE_KEYS.activity, state.activities);
-                state.pagination.page = 1;
-                resetFormMode();
-                renderAll();
-                logActivity('report', 'JSON snapshot imported.', `${state.events.length} events loaded from ${file.name}`);
-                showToast('JSON data imported successfully.', 'success');
-            } catch (error) {
-                showToast('Invalid JSON file. Please import a valid dashboard snapshot.', 'error', 5000);
-            } finally {
-                fileInput.value = '';
-            }
-        };
-
-        reader.onerror = () => {
-            showToast('Could not read the selected file.', 'error');
-            fileInput.value = '';
-        };
-
-        reader.readAsText(file);
-    }
-
-    function validateImportedSnapshot(payload) {
-        if (!payload || typeof payload !== 'object') {
-            throw new Error('Snapshot must be an object.');
-        }
-
-        if (!Array.isArray(payload.events)) {
-            throw new Error('Snapshot events array missing.');
-        }
-
-        const validEvents = payload.events.filter(isValidEventShape);
-        if (!validEvents.length) {
-            throw new Error('Snapshot has no valid events.');
-        }
-
-        const validActivities = Array.isArray(payload.activities)
-            ? payload.activities.filter(isValidActivityShape).slice(0, 100)
-            : [];
-
-        return {
-            events: validEvents,
-            activities: validActivities
         };
     }
 
@@ -1486,11 +1429,6 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
-    }
-
-    function escapeCsvCell(value) {
-        const text = String(value ?? '');
-        return `"${text.replace(/"/g, '""')}"`;
     }
 
     document.addEventListener('DOMContentLoaded', init);
