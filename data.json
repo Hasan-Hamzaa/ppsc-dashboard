@@ -1,17 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-09T09:48:29.487Z",
+  "updatedAt": "2026-04-09T10:58:50.863Z",
   "events": [
-    {
-      "id": "EVT-3001",
-      "type": "Planned",
-      "bank": "Arab Bank",
-      "system": "ECC",
-      "impact": "Medium",
-      "start": "2026-04-10T01:00",
-      "end": "2026-04-10T03:30",
-      "notes": "Scheduled schema optimization and patch cycle."
-    },
     {
       "id": "EVT-3002",
       "type": "Emergency",
@@ -31,7 +21,32 @@
       "start": "2026-04-14T22:00",
       "end": "2026-04-15T01:00",
       "notes": "Rolling deployment and API gateway update."
+    },
+    {
+      "id": "EVT-3004",
+      "type": "Planned",
+      "bank": "Bank of Palestine",
+      "system": "ECC",
+      "impact": "High",
+      "start": "2026-05-01T13:58",
+      "end": "2026-05-02T13:58",
+      "notes": "Test"
     }
   ],
-  "activities": []
+  "activities": [
+    {
+      "id": "ACT-1775732315636-309",
+      "type": "create",
+      "title": "New maintenance event created.",
+      "message": "EVT-3004 · Bank of Palestine · ECC",
+      "timestamp": 1775732315636
+    },
+    {
+      "id": "ACT-1775732287559-442",
+      "type": "delete",
+      "title": "Maintenance event deleted.",
+      "message": "EVT-3001 · Arab Bank · ECC",
+      "timestamp": 1775732287559
+    }
+  ]
 }
