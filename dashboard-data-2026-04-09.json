@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "exportedAt": "2026-04-09T09:23:46.244Z",
+  "events": [],
+  "activities": [
+    {
+      "id": "ACT-1775726624765-995",
+      "type": "delete",
+      "title": "All maintenance events cleared.",
+      "message": "8 events removed",
+      "timestamp": 1775726624765
+    },
+    {
+      "id": "ACT-1775725684769-708",
+      "type": "delete",
+      "title": "All maintenance events cleared.",
+      "message": "8 events removed",
+      "timestamp": 1775725684769
+    }
+  ]
+}
