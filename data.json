@@ -1,19 +1,57 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-09T11:08:19.806Z",
+  "updatedAt": "2026-04-09T11:25:39.924Z",
   "events": [
     {
       "id": "EVT-3001",
       "type": "Planned",
-      "bank": "Cairo Amman Bank",
-      "system": "National Switch",
-      "impact": "Medium",
-      "start": "2026-04-09T14:08",
-      "end": "2026-04-09T17:08",
+      "bank": "Arab Bank",
+      "system": "ESADAD",
+      "impact": "High",
+      "start": "2026-04-11T01:00",
+      "end": "2026-04-11T07:00",
       "notes": ""
+    },
+    {
+      "id": "EVT-3002",
+      "type": "Planned",
+      "bank": "Arab Bank",
+      "system": "National Switch",
+      "impact": "High",
+      "start": "2026-04-11T01:00",
+      "end": "2026-04-11T07:00",
+      "notes": "National"
     }
   ],
   "activities": [
+    {
+      "id": "ACT-1775733921357-919",
+      "type": "create",
+      "title": "New maintenance event created.",
+      "message": "EVT-3002 · Arab Bank · National Switch",
+      "timestamp": 1775733921357
+    },
+    {
+      "id": "ACT-1775733881770-285",
+      "type": "create",
+      "title": "New maintenance event created.",
+      "message": "EVT-3001 · Arab Bank · ESADAD",
+      "timestamp": 1775733881770
+    },
+    {
+      "id": "ACT-1775733539048-250",
+      "type": "delete",
+      "title": "Maintenance event deleted.",
+      "message": "EVT-3001 · Cairo Amman Bank · National Switch",
+      "timestamp": 1775733539048
+    },
+    {
+      "id": "ACT-1775732899811-639",
+      "type": "report",
+      "title": "Project data saved.",
+      "message": "1 events written to data.json",
+      "timestamp": 1775732899811
+    },
     {
       "id": "ACT-1775732897747-836",
       "type": "create",
