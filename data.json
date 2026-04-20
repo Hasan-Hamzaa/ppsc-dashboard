@@ -1,19 +1,57 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-20T06:33:53.535Z",
+  "updatedAt": "2026-04-20T06:37:18.864Z",
   "events": [
+    {
+      "id": "EVT-3001",
+      "type": "Planned",
+      "bank": "Arab Bank",
+      "system": "ESADAD",
+      "impact": "Low",
+      "start": "2026-04-21T01:00",
+      "end": "2026-04-21T05:00",
+      "notes": "GDR Sanity Test- SMS"
+    },
     {
       "id": "EVT-3002",
       "type": "Planned",
       "bank": "Arab Bank",
       "system": "National Switch",
-      "impact": "High",
-      "start": "2026-04-11T01:00",
-      "end": "2026-04-11T07:00",
-      "notes": "National"
+      "impact": "Low",
+      "start": "2026-04-21T01:00",
+      "end": "2026-04-21T05:00",
+      "notes": "GDR Sanity Test-SMS"
     }
   ],
   "activities": [
+    {
+      "id": "ACT-1776667035292-94",
+      "type": "create",
+      "title": "New maintenance event created.",
+      "message": "EVT-3002 · Arab Bank · National Switch",
+      "timestamp": 1776667035292
+    },
+    {
+      "id": "ACT-1776666983387-738",
+      "type": "create",
+      "title": "New maintenance event created.",
+      "message": "EVT-3001 · Arab Bank · ESADAD",
+      "timestamp": 1776666983387
+    },
+    {
+      "id": "ACT-1776666923381-823",
+      "type": "delete",
+      "title": "All maintenance events cleared.",
+      "message": "1 events removed",
+      "timestamp": 1776666923381
+    },
+    {
+      "id": "ACT-1776666833546-928",
+      "type": "report",
+      "title": "Project data saved.",
+      "message": "1 events written to data.json",
+      "timestamp": 1776666833547
+    },
     {
       "id": "ACT-1776666832511-519",
       "type": "delete",
